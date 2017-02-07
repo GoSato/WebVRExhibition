@@ -2,7 +2,7 @@
 	var STEP = 100;
 
 	var scene; // シーン
-	var spere; // 球体
+	var sphere; // 球体
 	var camera; // カメラ
 	var element; // DOM
 	var renderer; // レンダラー
@@ -19,6 +19,10 @@
 		camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 3000);
 		camera.position.set(0, 700, 0);
 		scene.add(camera);
+
+		var cameraRig = new THREE.Object3D();
+		cameraRig.add(camera);
+		scene.add(cameraRig);
 
 		// ライト
 		// light = new THREE.DirectionalLight(0xffffff, 1);
@@ -40,12 +44,14 @@
 		effect = new THREE.StereoEffect(renderer);
 		effect.separation = 0.06;
 
-		controls = new THREE.OrbitControls(camera, element);
+		createSphere();
+
+		controls = new THREE.OrbitControls(cameraRig, element);
 		controls.rotateUp(Math.PI / 4);
 		controls.target.set(
-			camera.position.x + 0.15,
-			camera.position.y,
-			camera.position.z
+			cameraRig.position.x + 0.15,
+			cameraRig.position.y,
+			cameraRig.position.z
 		);
 		controls.noZoom = true;
 		controls.noPan = true;
@@ -62,14 +68,17 @@
 
 		createBrid();
 
-		// sphere = new THREE.Mesh(
-		// 	new THREE.SphereGeometry(100, 20, 20),
-		// 	new THREE.MeshLambertMaterial({color: 0x8dc3ff})
-		// );
-		// sphere.position.set(0,0,10);
-		// scene.add(sphere);
-
 		loop();
+	}
+
+	function createSphere()
+	{
+		sphere = new THREE.Mesh(
+			new THREE.SphereGeometry(100, 20, 20),
+			new THREE.MeshLambertMaterial({color: 0xFFFFFF})
+		);
+		sphere.position.set(0,400,10);
+		scene.add(sphere);
 	}
 
 	function setOrientationControls(e){
@@ -77,7 +86,7 @@
 			return;
 		}
 
-		controls = new THREE.DeviceOrientationControls(camera, true);
+		controls = new THREE.DeviceOrientationControls(cameraRig, true);
 		controls.connect();
 		controls.update();
 
