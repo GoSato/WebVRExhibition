@@ -46,22 +46,30 @@
 
 		createSphere();
 
-		controls = new THREE.OrbitControls(cameraRig, element);
-		controls.rotateUp(Math.PI / 4);
-		controls.target.set(
-			cameraRig.position.x + 0.15,
-			cameraRig.position.y,
-			cameraRig.position.z
-		);
-		controls.noZoom = true;
-		controls.noPan = true;
+		// controls = new THREE.OrbitControls(cameraRig, element);
+		// controls.rotateUp(Math.PI / 4);
+		// // controls.target.set(
+		// // 	camera.position.x + 0.15,
+		// // 	camera.position.y,
+		// // 	camera.position.z
+		// // );
+		// controls.noZoom = true;
+		// controls.noPan = true;
+
+		controls = new THREE.DeviceOrientationControls(camera, true);
+		controls.connect();
+		controls.update();
+
+		controls.object = cameraRig;
+		controls.object.rotation.reorder('YXZ');
 
 		clock = new THREE.Clock;
 
 		// ジャイロセンサーを使って制御
-		window.addEventListener("deviceorientation", setOrientationControls, true);
+		// window.addEventListener("deviceorientation", setOrientationControls, true);
 
 		window.addEventListener("resize", resize, false);
+
 		resize();
 
 		createBox();
@@ -86,7 +94,8 @@
 			return;
 		}
 
-		controls = new THREE.DeviceOrientationControls(cameraRig, true);
+		controls = new THREE.DeviceOrientationControls(camera, true);
+
 		controls.connect();
 		controls.update();
 
