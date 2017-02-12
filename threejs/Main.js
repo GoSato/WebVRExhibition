@@ -9,13 +9,11 @@
     var light;
     var sphere;
 
-    window.addEventListener("DOMContentLoaded", init, false);
+    window.addEventListener("DOMContentLoaded", objLoad, false);
 
 
     function init()
     {
-        scene = new THREE.Scene();
-
         camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 3000);
         camera.position.set(0, 0, 300);
         scene.add(camera);
@@ -29,7 +27,7 @@
         scene.add(light);
 
         renderer = new THREE.WebGLRenderer({antialias: true});
-        renderer.setClearColor(0xffffff);
+        renderer.setClearColor(0x000000);
         renderer.setSize(window.innerWidth, window.innerHeight);
 
         element = renderer.domElement;
@@ -40,30 +38,37 @@
         effect = new THREE.StereoEffect(renderer);
         effect.separation = 0.06;
 
-        // controls = new THREE.OrbitControls(camera, element);
-        // // controls.rotateUp(Math.PI / 4);
-        // // controls.target.set(
-        // //     camera.position.x + 0.15,
-        // //     camera.position.y,
-        // //     camera.position.z
-        // // );
-        // controls.noZoom = true;
-        // controls.noPan = true;
+        /*マウス*/
 
-        controls = new THREE.DeviceOrientationControls(cameraRig, true);
-        controls.connect();
+        controls = new THREE.OrbitControls(camera, element);
+        // controls.rotateUp(Math.PI / 4);
+        // 見回すように回転
+        // controls.target.set(
+        //     camera.position.x + 0.15,
+        //     camera.position.y,
+        //     camera.position.z
+        // );
+        controls.noZoom = true;
+        controls.noPan = true;
+
+        /*ジャイロ*/
+
+        // controls = new THREE.DeviceOrientationControls(cameraRig, true);
+        // controls.connect();
 
         window.addEventListener("resize", resize, false);
         resize();
 
         // window.addEventListener("deviceorientation", setOrientationControls, true);
 
-        loop();
         
         /*関数*/
-        createSphere();
+        // createSphere();
+        // objLoad();
         createGrid();
         createAxis();
+
+        loop();
     }
 
     function loop()
@@ -84,13 +89,11 @@
         {
             return;
         }
-        window.removeEventListener("deviceorientation", setOrientationControls, true);
 
-        controls = new THREE.DeviceOrientationControls(camera, true);
+        controls = new THREE.DeviceOrientationControls(cameraRig, true);
         controls.connect();
-        controls.update();
-        controls.object = cameraRig;
-        controls.object.rotation.reorder('YXZ');
+
+        window.removeEventListener("deviceorientation", setOrientationControls, true);
     }
 
     function resize()
@@ -103,6 +106,47 @@
 
         renderer.setSize(width, height);
         effect.setSize(width, height);
+    }
+
+    function objLoad()
+    {
+        // var mtlLoader = new THREE.MTLLoader();
+        // mtlLoader.load("../models/timelessness.mtl", (material) => {
+        //     material.preload();
+
+        //     var objLoader = new THREE.OBJLoader();
+        //     objLoader.setMaterials(material);
+        //     objLoader.load("../models/timelessness.obj", (object) => {
+        //         var mesh = object;
+        //         scene.add(mesh);
+        //     });
+        // });
+
+        // var manager = new THREE.LoadingManager();
+        // manager.onProgress = function ( item, loaded, total ) {
+        //     console.log( item, loaded, total );
+        // };
+
+        // var onProgress = function ( xhr ) {
+        //     if ( xhr.lengthComputable ) {
+        //         var percentComplete = xhr.loaded / xhr.total * 100;
+        //         console.log( Math.round(percentComplete, 2) + '% downloaded' );
+        //     }
+        // };
+
+        // var onError = function ( xhr ) {
+        // };
+        
+        scene = new THREE.Scene();
+        
+        var loader = new THREE.OBJMTLLoader();
+        // gopher.obj / gopher.mtl
+        loader.load( '../models/timelessness.obj', '../models/timelessness.mtl', function (object) {
+            object.position.set(0, 20, 0);
+            object.scale.set(200,200,200);
+            scene.add(object);
+            init();
+        });
     }
 
     function createSphere()
@@ -119,7 +163,7 @@
     function createGrid()
     {
         var grid = new THREE.GridHelper(10000, 100);
-        grid.setColors(0x444444, 0x444444);
+        // grid.setColors(0x444444, 0x444444);
         scene.add(grid);
     }
 
