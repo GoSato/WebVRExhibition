@@ -4,15 +4,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<title>WebVRExhibition</title>
+	<link rel="stylesheet" type="text/css" href="Main.css">
 
-	<style>
-		body{
-			margin: 0;
-			overflow: hidden;
-		}
-	</style>
-
-	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>	
+	<!-- video : r76 -->
+	<!-- obj : r71 -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>	
 	<script src="threejs/Library/DeviceOrientationControls.js"></script>
 	<script src="threejs/Library/OrbitControls.js"></script>
 	<script src="threejs/Library/StereoEffect.js"></script>
@@ -20,11 +16,20 @@
 	<script src="threejs/Library/MTLLoader.js"></script>
 	<script src="threejs/Library/OBJMTLLoader.js"></script>
 	<script src="threejs/Library/stats.min.js"></script>
+	<script src="threejs/Library/VRControls.js"></script>
+	<script src="threejs/Library/VREffect.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.17.0/TweenMax.min.js"></script>
 	<script src="threejs/Main.js"></script>
-
+	
 </head>
+
 <body>
-	<div id="container"></div>
+	<div id="base"></div>
+	<div id="container">
+		<div id="cursors">
+			<div class="cursor cursor-l"><p class="dot"></p></div>
+			<div class="cursor cursor-r"><p class="dot"></p></div>
+		</div>
+	</div>
 </body>
 </html>

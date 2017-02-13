@@ -9,6 +9,11 @@ var sphere;
 var cameraRig;
 var effect;
 var stats;
+var raycaster;
+var scopedObj;
+var cursor;
+var group;
+var parent;
 
 setup();
 
@@ -18,6 +23,10 @@ function setup()
     // Scene
     scene = new THREE.Scene();
     scene.visible = false;
+
+    // Group
+    group = new THREE.Group();
+    scene.add(group);
 
     // モデルの読み込み
     var loader = new THREE.OBJMTLLoader();
@@ -49,7 +58,7 @@ function start(object)
 
     // renderer
     renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setClearColor(0x000000);
+    renderer.setClearColor(0xffffff);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     // container
@@ -59,13 +68,18 @@ function start(object)
 
     // effect
     effect = new THREE.StereoEffect(renderer);
-    effect.separation = 0.06;
+    // effect.separation = 0.06;
 
+    // stats FPS計測用
     stats = new Stats();
     stats.domElement.style.position = "absolute";
     stats.domElement.style.top = "0px";
     stats.domElement.style.zIndex = 100;
     container.appendChild(stats.domElement);
+
+    // raycaster用
+    cursor = new THREE.Vector2(0, 0);
+    raycaster = new THREE.Raycaster();
 
     createScene(object);
 }
@@ -76,8 +90,9 @@ function createScene(object)
     object.scale.x = scale;
     object.scale.y = scale;
     object.scale.z = scale;
-    object.position.set(0, 100, 0);
-    scene.add(object);
+    object.position.set(0, 0, 0);
+    object.name = "timelessness";
+    group.add(object);
     onLoad();
 }
 
@@ -85,6 +100,8 @@ function onLoad()
 {
     window.addEventListener("resize", resize, false);
     resize();
+    
+    // camera or cameraRig
     controls = new THREE.DeviceOrientationControls(cameraRig, true);
     controls.connect();
     
@@ -93,15 +110,16 @@ function onLoad()
     // controls = new THREE.OrbitControls(camera, element);
     // // controls.rotateUp(Math.PI / 4);
     // // 見回すように回転
-    // // controls.target.set(
-    // //     camera.position.x + 0.15,
-    // //     camera.position.y,
-    // //     camera.position.z
-    // // );
+    // controls.target.set(
+    //     camera.position.x + 0.15,
+    //     camera.position.y,
+    //     camera.position.z
+    // );
     // controls.noZoom = true;
     // controls.noPan = true;
 
-    createAxis()
+    createAxis();
+    // createSphere();
     animate();
     scene.visible = true;
 }
@@ -109,13 +127,33 @@ function onLoad()
 function animate()
 {
     requestAnimationFrame(animate);
-    controls.update();
     render();
     stats.update();
 }
 
 function render()
 {
+    controls.update();
+    
+    raycaster.setFromCamera(cursor, camera);
+    var intersects = raycaster.intersectObjects(group.children, true);
+    if ( intersects.length > 0 )
+    {
+        console.log("test");
+        if ( scopedObj != intersects[ 0 ].object )
+        {
+            if ( scopedObj ) scopedObj.scale.set(1,1,1);
+            scopedObj = intersects[ 0 ].object;
+            scopedObj.scale.set(2,2,2);
+            console.log(scopedObj);
+        }
+    } 
+    else
+    {
+        if ( scopedObj ) scopedObj.scale.set(1,1,1);
+        scopedObj = null;
+    }
+
     effect.render(scene, camera);
 }
 
@@ -154,7 +192,8 @@ function createSphere()
     );
 
     sphere.position.set(0, 0, 0);
-    scene.add(sphere);
+    group.add(sphere);
+    console.log(sphere);
 }
 
 function createGrid()
