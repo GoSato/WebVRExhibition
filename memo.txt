@@ -1,5 +1,6 @@
-・OrbitControl
-・objインポート
+/・OrbitControl
+/・objインポート
 ・複数配置
 ・全天球動画再生
+・クリックアニメーション
 ・クオリティチェック
