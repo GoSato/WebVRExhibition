@@ -3,6 +3,7 @@ var camera;
 var element;
 var renderer;
 var container;
+var orbitControls;
 var controls;
 var light;
 var sphere;
@@ -14,6 +15,11 @@ var scopedObj;
 var cursor;
 var group;
 var parent;
+var clock;
+var elapsedTime = 0;
+
+var useOrbit = false;
+var useRaycast = true;
 
 setup();
 
@@ -81,6 +87,9 @@ function start(object)
     cursor = new THREE.Vector2(0, 0);
     raycaster = new THREE.Raycaster();
 
+    // Time
+    clock = new THREE.Clock();
+
     createScene(object);
 }
 
@@ -100,11 +109,15 @@ function onLoad()
 {
     window.addEventListener("resize", resize, false);
     resize();
-    
-    // camera or cameraRig
-    controls = new THREE.DeviceOrientationControls(cameraRig, true);
+
+    // 通常使用
+    controls = new THREE.DeviceOrientationControls(camera, true);
     controls.connect();
-    
+
+    // Oribit
+    orbitControls = new THREE.DeviceOrientationControls(cameraRig, true);
+    orbitControls.connect();
+
     /*マウス*/
 
     // controls = new THREE.OrbitControls(camera, element);
@@ -118,7 +131,7 @@ function onLoad()
     // controls.noZoom = true;
     // controls.noPan = true;
 
-    createAxis();
+    // createAxis();
     // createSphere();
     animate();
     scene.visible = true;
@@ -133,25 +146,58 @@ function animate()
 
 function render()
 {
-    controls.update();
-    
-    raycaster.setFromCamera(cursor, camera);
-    var intersects = raycaster.intersectObjects(group.children, true);
-    if ( intersects.length > 0 )
-    {
-        console.log("test");
-        if ( scopedObj != intersects[ 0 ].object )
-        {
-            if ( scopedObj ) scopedObj.scale.set(1,1,1);
-            scopedObj = intersects[ 0 ].object;
-            scopedObj.scale.set(2,2,2);
-            console.log(scopedObj);
-        }
-    } 
+    if(useOrbit)
+    {    
+        orbitControls.update();
+    }
     else
     {
-        if ( scopedObj ) scopedObj.scale.set(1,1,1);
-        scopedObj = null;
+        controls.update();
+    }
+
+
+    
+    if(useRaycast)
+    {
+        raycaster.setFromCamera(cursor, camera);
+        var intersects = raycaster.intersectObjects(group.children, true);
+    
+        if ( intersects.length > 0 )
+        {
+            if ( scopedObj != intersects[ 0 ].object )
+            {
+                if ( scopedObj ) scopedObj.scale.set(1,1,1);
+                scopedObj = intersects[ 0 ].object;
+                // scopedObj.scale.set(2,2,2);
+                TweenLite.to(scopedObj.scale, 1, {x:2, y:2, z:2});
+            
+                useOrbit = true;
+                useRaycast = false;
+                orbitControls.enabled = true;
+                controls.enabled = false;
+            }
+        } 
+    }
+    else
+    {
+        elapsedTime += clock.getDelta();
+
+        if(elapsedTime > 5.0){
+
+            if ( scopedObj ) 
+            {
+                TweenLite.to(scopedObj.scale, 1, {x:1, y:1, z:1});
+            }
+            // scopedObj.scale.set(1,1,1);
+            
+            scopedObj = null;
+
+            useOrbit = false;
+            useRaycast = true;
+            orbitControls.enabled = false;
+            controls.enabled = true;
+            elapsedTime = 0;
+        }
     }
 
     effect.render(scene, camera);
