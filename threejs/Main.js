@@ -102,6 +102,38 @@ function createScene(object)
     object.position.set(0, 0, 300);
     object.name = "timelessness";
     group.add(object);
+    
+    var clone = object.clone();
+    clone.position.set(0, 0, -300);
+    group.add(clone);
+
+    clone = object.clone();
+    clone.position.set(300, 0, 0);
+    group.add(clone);
+
+    clone = object.clone();
+    clone.position.set(-300, 0, 0);
+    group.add(clone);
+
+    //
+    clone = object.clone();
+    clone.position.set(0, -300, 300);
+    group.add(clone);
+
+    var clone = object.clone();
+    clone.position.set(0, -300, -300);
+    group.add(clone);
+
+    clone = object.clone();
+    clone.position.set(300, -300, 0);
+    group.add(clone);
+
+    clone = object.clone();
+    clone.position.set(-300, -300, 0);
+    group.add(clone);
+
+    
+   
     onLoad(object);
 }
 
@@ -132,7 +164,8 @@ function onLoad(object)
     // controls.noPan = true;
 
     // createAxis();
-    createSphere();
+    // createGrid();
+    // createSphere();
     animate();
     scene.visible = true;
 }
@@ -239,13 +272,12 @@ function resize()
 function createSphere()
 {
     sphere = new THREE.Mesh(
-        new THREE.CubeGeometry(50, 20, 20),
+        new THREE.CubeGeometry(100, 100, 100),
         new THREE.MeshLambertMaterial({color: 0xff0000})
     );
 
     sphere.position.set(0, 0, -300);
     group.add(sphere);
-    console.log(sphere);
 }
 
 function createGrid()
