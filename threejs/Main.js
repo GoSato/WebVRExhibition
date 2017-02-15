@@ -21,7 +21,7 @@ var elapsedTime = 0;
 var useOrbit = false;
 var useRaycast = true;
 
-var videoFile="threejs/video/sample.mp4";
+var videoFile="threejs/video/ANIMATION.mp4";
 var video;
 var videoTexture;
 var mode;
