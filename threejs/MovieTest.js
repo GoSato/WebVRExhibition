@@ -4,18 +4,24 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild(renderer.domElement);
+element = renderer.domElement;
+container = document.getElementById("base");
+container.appendChild(element);
 
 //WebVR Boilerplate
-var controls = new THREE.VRControls(camera);
-controls.standing = true;
-var effect = new THREE.VREffect(renderer);
-effect.setSize(window.innerWidth, window.innerHeight);
+// var controls = new THREE.VRControls(camera);
+// controls.standing = true;
+var controls = new THREE.DeviceOrientationControls(camera, true);
+controls.connect();
+
+// var effect = new THREE.VREffect(renderer);
+// effect.setSize(window.innerWidth, window.innerHeight);
+var effect = new THREE.StereoEffect(renderer);
 
 // var manager = new WebVRManager(renderer, effect);
 
 window.addEventListener('resize', onResize, true);
-window.addEventListener('vrdisplaypresentchange', onResize, true);
+// window.addEventListener('vrdisplaypresentchange', onResize, true);
 
 var btn = document.querySelector('button');
 btn.disabled = true;
@@ -119,7 +125,7 @@ function render() {
   requestAnimationFrame(render);
   controls.update();//step1 control
   // renderer.render(scene, camera);
-  renderer.render(scene, camera);//step3
+  effect.render(scene, camera);//step3
 }
 render();
 

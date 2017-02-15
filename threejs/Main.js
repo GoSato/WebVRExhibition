@@ -21,6 +21,17 @@ var elapsedTime = 0;
 var useOrbit = false;
 var useRaycast = true;
 
+var videoFile="threejs/video/sample.mp4";
+var video;
+var videoTexture;
+var mode;
+var ctx;
+var btn;
+var audio;
+var canvas;
+var togglePlay;
+var ua;
+
 setup();
 
 // モデルのロードを待つ
@@ -81,7 +92,7 @@ function start(object)
     stats.domElement.style.position = "absolute";
     stats.domElement.style.top = "0px";
     stats.domElement.style.zIndex = 100;
-    container.appendChild(stats.domElement);
+    // container.appendChild(stats.domElement);
 
     // raycaster用
     cursor = new THREE.Vector2(0, 0);
@@ -166,6 +177,7 @@ function onLoad(object)
     // createAxis();
     // createGrid();
     // createSphere();
+    createMovie();
     animate();
     scene.visible = true;
 }
@@ -240,6 +252,17 @@ function render()
     }
 
     effect.render(scene, camera);
+   
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    //videoImageContext.drawImage(video, 0, 0);
+    if (videoTexture) {
+      videoTexture.needsUpdate = true;
+    }
+
+    if(mode == "currentTime")video.currentTime = audio.currentTime;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  }
+
 }
 
 // function setOrientationControls(e)
@@ -291,4 +314,95 @@ function createAxis()
 {
     var axis = new THREE.AxisHelper(1000);
     scene.add(axis);
+}
+
+function createMovie()
+{
+    btn = document.querySelector('button');
+    btn.disabled = true;
+
+    audio = new Audio();
+    video = document.createElement('video');
+    canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 640;
+    ctx = canvas.getContext('2d');
+    togglePlay;
+    ua = navigator.userAgent;
+    mode = 'none';
+
+    if(/(iPhone|iPod)/.test(ua)) { // iPhoneでvideoをインライン再生
+        //ctx.scale(0.5,0.5);
+        var prms1 = new Promise(function(resolve, reject) {
+            video.addEventListener('canplay',function(){
+                resolve();
+            });
+            video.addEventListener('error',function(){
+                reject();
+                alert('failed loading video');
+            });
+        });
+        var prms2 = new Promise(function(resolve, reject) {
+            audio.addEventListener('canplay',function(){
+                resolve();
+            });
+            audio.addEventListener('error',function(){
+                reject();
+                alert('failed loading audio');
+            });
+        });
+        Promise.all([prms1,prms2]).then(function(){
+            btn.disabled = false;
+            mode = 'currentTime';
+            makeSkybox();
+        });
+        video.src = videoFile;
+        video.load();
+        audio.src = videoFile;
+        audio.load();
+
+        togglePlay = function(){
+        if(audio.paused){
+            audio.play();
+        } else {
+            audio.pause();
+        }
+        };
+    } else { // Androidなどは素直にVideoタグで再生
+        //video.style.display = 'block';
+        video.src = videoFile;
+        video.load();
+        video.addEventListener('canplay',function(){
+        btn.disabled = false;
+        mode = 'defaultPlay';
+        makeSkybox();
+        },false);
+        video.addEventListener('error',function(){
+            alert('failed loading video');
+        });
+
+        togglePlay = function(){
+        if(video.paused){
+            video.play();
+        } else {
+            video.pause();
+        }
+        };
+    }
+    btn.addEventListener('click',togglePlay);
+
+    //生成したcanvasをtextureとしてTHREE.Textureオブジェクトを生成
+    videoTexture = new THREE.Texture(canvas);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+
+    //生成したtextureをmapに指定し、overdrawをtureにしてマテリアルを生成
+    var sky;
+    function makeSkybox(){
+    var material = new THREE.MeshBasicMaterial({map: videoTexture, overdraw: true, side:THREE.DoubleSide});
+    var geometry = new THREE.SphereGeometry( 500, 20, 20 );
+    geometry.scale( - 1, 1, 1 );
+    sky = new THREE.Mesh( geometry, material );
+    scene.add( sky );
+    }
 }
