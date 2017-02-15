@@ -49,7 +49,7 @@ function start(object)
 {
     // camera
     camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 3000);
-    camera.position.set(0, 0, 300);
+    camera.position.set(0, 0, 0);
     scene.add(camera);
 
     // caemraRig
@@ -99,13 +99,13 @@ function createScene(object)
     object.scale.x = scale;
     object.scale.y = scale;
     object.scale.z = scale;
-    object.position.set(0, 0, 0);
+    object.position.set(0, 0, 300);
     object.name = "timelessness";
     group.add(object);
-    onLoad();
+    onLoad(object);
 }
 
-function onLoad()
+function onLoad(object)
 {
     window.addEventListener("resize", resize, false);
     resize();
@@ -115,7 +115,7 @@ function onLoad()
     controls.connect();
 
     // Oribit
-    orbitControls = new THREE.DeviceOrientationControls(cameraRig, true);
+    orbitControls = new THREE.DeviceOrientationControls(object, true);
     orbitControls.connect();
 
     /*マウス*/
@@ -132,7 +132,7 @@ function onLoad()
     // controls.noPan = true;
 
     // createAxis();
-    // createSphere();
+    createSphere();
     animate();
     scene.visible = true;
 }
@@ -170,6 +170,8 @@ function render()
                 scopedObj = intersects[ 0 ].object;
                 // scopedObj.scale.set(2,2,2);
                 TweenLite.to(scopedObj.scale, 1, {x:2, y:2, z:2});
+                orbitControls.object = scopedObj;
+                orbitControls.connect();
             
                 useOrbit = true;
                 useRaycast = false;
@@ -237,11 +239,11 @@ function resize()
 function createSphere()
 {
     sphere = new THREE.Mesh(
-        new THREE.SphereGeometry(50, 20, 20),
+        new THREE.CubeGeometry(50, 20, 20),
         new THREE.MeshLambertMaterial({color: 0xff0000})
     );
 
-    sphere.position.set(0, 0, 0);
+    sphere.position.set(0, 0, -300);
     group.add(sphere);
     console.log(sphere);
 }
