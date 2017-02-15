@@ -182,7 +182,7 @@ function render()
     {
         elapsedTime += clock.getDelta();
 
-        if(elapsedTime > 5.0){
+        if(elapsedTime > 5.0 && useOrbit){
 
             if ( scopedObj ) 
             {
@@ -193,9 +193,13 @@ function render()
             scopedObj = null;
 
             useOrbit = false;
-            useRaycast = true;
             orbitControls.enabled = false;
             controls.enabled = true;
+        }
+
+        if(elapsedTime > 7.0 && !useOrbit)
+        {
+            useRaycast = true;
             elapsedTime = 0;
         }
     }
