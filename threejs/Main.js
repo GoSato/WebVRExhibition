@@ -31,6 +31,8 @@ var audio;
 var canvas;
 var togglePlay;
 var ua;
+var rotationY = 0;
+var exhibition;
 
 setup();
 
@@ -106,42 +108,44 @@ function start(object)
 
 function createScene(object)
 {
-    var scale = 150;
+    var scale = 70;
     object.scale.x = scale;
     object.scale.y = scale;
     object.scale.z = scale;
-    object.position.set(0, 0, 300);
+    object.position.set(0, -100, 300);
+    object.rotation.set(-Math.PI/4, 0, Math.PI/4)
     object.name = "timelessness";
-    group.add(object);
+    exhibition = object;
+    group.add(exhibition);
     
-    var clone = object.clone();
-    clone.position.set(0, 0, -300);
-    group.add(clone);
+    // var clone = object.clone();
+    // clone.position.set(0, 0, -300);
+    // group.add(clone);
 
-    clone = object.clone();
-    clone.position.set(300, 0, 0);
-    group.add(clone);
+    // clone = object.clone();
+    // clone.position.set(300, 0, 0);
+    // group.add(clone);
 
-    clone = object.clone();
-    clone.position.set(-300, 0, 0);
-    group.add(clone);
+    // clone = object.clone();
+    // clone.position.set(-300, 0, 0);
+    // group.add(clone);
 
-    //
-    clone = object.clone();
-    clone.position.set(0, -300, 300);
-    group.add(clone);
+    // //
+    // clone = object.clone();
+    // clone.position.set(0, -300, 300);
+    // group.add(clone);
 
-    var clone = object.clone();
-    clone.position.set(0, -300, -300);
-    group.add(clone);
+    // var clone = object.clone();
+    // clone.position.set(0, -300, -300);
+    // group.add(clone);
 
-    clone = object.clone();
-    clone.position.set(300, -300, 0);
-    group.add(clone);
+    // clone = object.clone();
+    // clone.position.set(300, -300, 0);
+    // group.add(clone);
 
-    clone = object.clone();
-    clone.position.set(-300, -300, 0);
-    group.add(clone);
+    // clone = object.clone();
+    // clone.position.set(-300, -300, 0);
+    // group.add(clone);
 
     
    
@@ -158,8 +162,8 @@ function onLoad(object)
     controls.connect();
 
     // Oribit
-    orbitControls = new THREE.DeviceOrientationControls(object, true);
-    orbitControls.connect();
+    // orbitControls = new THREE.DeviceOrientationControls(object, true);
+    // orbitControls.connect();
 
     /*マウス*/
 
@@ -186,21 +190,25 @@ function animate()
 {
     requestAnimationFrame(animate);
     render();
+    if(!useRaycast)
+    {
+        rotation();
+    }
     stats.update();
 }
 
 function render()
 {
-    if(useOrbit)
-    {    
-        orbitControls.update();
-    }
-    else
-    {
+    // if(useOrbit)
+    // {    
+    //     orbitControls.update();
+    // }
+    // else
+    // {
         controls.update();
-    }
+    // }
 
-
+    // レイキャスト
     
     if(useRaycast)
     {
@@ -213,15 +221,14 @@ function render()
             {
                 if ( scopedObj ) scopedObj.scale.set(1,1,1);
                 scopedObj = intersects[ 0 ].object;
-                // scopedObj.scale.set(2,2,2);
                 TweenLite.to(scopedObj.scale, 1, {x:2, y:2, z:2});
-                orbitControls.object = scopedObj;
-                orbitControls.connect();
+                // orbitControls.object = scopedObj;
+                // orbitControls.connect();
             
                 useOrbit = true;
                 useRaycast = false;
-                orbitControls.enabled = true;
-                controls.enabled = false;
+                // orbitControls.enabled = true;
+                // controls.enabled = false;
             }
         } 
     }
@@ -235,13 +242,12 @@ function render()
             {
                 TweenLite.to(scopedObj.scale, 1, {x:1, y:1, z:1});
             }
-            // scopedObj.scale.set(1,1,1);
             
             scopedObj = null;
 
             useOrbit = false;
-            orbitControls.enabled = false;
-            controls.enabled = true;
+            // orbitControls.enabled = false;
+            // controls.enabled = true;
         }
 
         if(elapsedTime > 7.0 && !useOrbit)
@@ -263,6 +269,12 @@ function render()
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   }
 
+}
+
+function rotation()
+{
+    rotationY = rotationY + 0.02;
+    exhibition.rotation.y = rotationY;
 }
 
 // function setOrientationControls(e)
