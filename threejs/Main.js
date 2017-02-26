@@ -47,7 +47,7 @@ function setup()
 
     // モデルの読み込み
     var loader = new THREE.OBJMTLLoader();
-    loader.load( 'threejs/models/timelessness.obj', 'threejs/models/timelessness.mtl', onLoad);
+    loader.load( 'threejs/models/ring_small_050.obj', 'threejs/models/ring_small_050.mtl', onLoad);
 
     function onLoad(object)
     {
