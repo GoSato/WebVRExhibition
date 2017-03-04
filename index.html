@@ -8,9 +8,9 @@
 
 	<!-- video : r76 -->
 	<!-- obj : r71 -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>	
+	<script src="threejs/Library/r73/three.min.js"></script>	
 	<script src="threejs/Library/DeviceOrientationControls.js"></script>
-	<script src="threejs/Library/OrbitControls.js"></script>
+	<script src="threejs/Library/r73/OrbitControls.js"></script>
 	<script src="threejs/Library/StereoEffect.js"></script>
 	<script src="threejs/Library/OBJLoader.js"></script>
 	<script src="threejs/Library/MTLLoader.js"></script>
@@ -19,18 +19,26 @@
 	<script src="threejs/Library/VRControls.js"></script>
 	<script src="threejs/Library/VREffect.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.17.0/TweenMax.min.js"></script>
-	<script src="threejs/Main.js"></script>
-	
+
+	<!-- Made by GO -->
+	<!-- ↓ This is Main Script , but Test Scrpit is Setted now -->
+	<!--<script src="threejs/Main.js"></script>-->
+	<script src="threejs/PanelAndButton.js"></script>
+
 </head>
 
 <body>
 	<div id="base"></div>
+	
+	<!--<div id="cursors">-->
+		<!--If you use MovieDemo, this line is uncommented -->
+		<!--<div class="control"><button>play/pause</button></div>-->
+		<!--<div class="cursor cursor-l"><p class="dot"></p></div>-->
+		<!--<div class="cursor cursor-r"><p class="dot"></p></div>-->
+	<!--</div>-->
+
 	<div id="container">
-		<div id="cursors">
-			<div class="control"><button>play/pause</button></div>
-			<div class="cursor cursor-l"><p class="dot"></p></div>
-			<div class="cursor cursor-r"><p class="dot"></p></div>
-		</div>
 	</div>
+
 </body>
 </html>
