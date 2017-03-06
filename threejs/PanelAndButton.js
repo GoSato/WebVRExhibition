@@ -207,6 +207,7 @@ function initObject()
         onGazeLong: function(){
             // do something user targetes object for specific time
             panelUI1.visible = false;
+            togglePlay();
         },
         onGazeClick: function(){
             // have the object react when user clicks / taps on targeted object
@@ -226,7 +227,6 @@ var video;
 var videoTexture;
 var mode;
 var ctx;
-var btn;
 var audio;
 var canvas;
 var togglePlay;
@@ -234,8 +234,6 @@ var ua;
 
 function createMovie()
 {
-    btn = document.querySelector('button');
-    btn.disabled = true;
 
     audio = new Audio();
     video = document.createElement('video');
@@ -267,7 +265,6 @@ function createMovie()
             });
         });
         Promise.all([prms1,prms2]).then(function(){
-            btn.disabled = false;
             mode = 'currentTime';
             makeSkybox();
         });
@@ -289,7 +286,6 @@ function createMovie()
         video.src = videoFile;
         video.load();
         video.addEventListener('canplay',function(){
-        btn.disabled = false;
         mode = 'defaultPlay';
         makeSkybox();
         },false);
@@ -306,7 +302,14 @@ function createMovie()
         };
     }
 
-    btn.addEventListener('click',togglePlay);
+    function ready()
+    {
+        audio.play();
+        audio.pause();
+        document.removeEventListener('touchstart', ready, false);
+    }
+
+    document.addEventListener('touchstart', ready, false);
 
     //生成したcanvasをtextureとしてTHREE.Textureオブジェクトを生成
     videoTexture = new THREE.Texture(canvas);
