@@ -1,7 +1,7 @@
 
 window.onload = threeStart;
 
-var useSmartPhone = false;
+var useSmartPhone = true;
 
 function threeStart()
 {
@@ -10,9 +10,10 @@ function threeStart()
      initScene();
      initCamera();
      initLight();
-     initObject();
      initReticulum();
-     createAxis();
+     createMovie();
+     initObject();
+    //  createAxis();
      loop();
 }
 
@@ -165,6 +166,25 @@ function initObject()
     playPanel.position.set(120, 0, 0);
     panelUI1.add(playPanel);
 
+     // set event
+    Reticulum.add( playPanel, {
+		reticleHoverColor: 0x00fff6,
+		fuseVisible: true,
+		onGazeOver: function(){
+			// do something when user targets object
+		},
+		onGazeOut: function(){
+			// do something when user moves reticle off targeted object
+		},
+		onGazeLong: function(){
+			// do something user targetes object for specific time
+            togglePlay();
+		},
+		onGazeClick: function(){
+			// have the object react when user clicks / taps on targeted object
+		}
+	});
+
     // ClosePanel
     texture = new THREE.ImageUtils.loadTexture('threejs/image/close.png');
     texture.anisotropy = renderer.getMaxAnisotropy();
@@ -176,22 +196,22 @@ function initObject()
     panelUI1.add(closePanel);
 
     Reticulum.add( closePanel, {
-    reticleHoverColor: 0x00fff6,
-    fuseVisible: true,
-    onGazeOver: function(){
-        // do something when user targets object
-    },
-    onGazeOut: function(){
-        // do something when user moves reticle off targeted object
-    },
-    onGazeLong: function(){
-        // do something user targetes object for specific time
-        panelUI1.visible = false;
-    },
-    onGazeClick: function(){
-        // have the object react when user clicks / taps on targeted object
-    }
-});
+        reticleHoverColor: 0x00fff6,
+        fuseVisible: true,
+        onGazeOver: function(){
+            // do something when user targets object
+        },
+        onGazeOut: function(){
+            // do something when user moves reticle off targeted object
+        },
+        onGazeLong: function(){
+            // do something user targetes object for specific time
+            panelUI1.visible = false;
+        },
+        onGazeClick: function(){
+            // have the object react when user clicks / taps on targeted object
+        }
+    });
 
     panelUI2 = panelUI1.clone();
     panelUI2.visible = false;
@@ -201,11 +221,115 @@ function initObject()
 }
 
 /* ---------------------------------------------------------- */
+var videoFile="threejs/video/ANIMATION.mp4";
+var video;
+var videoTexture;
+var mode;
+var ctx;
+var btn;
+var audio;
+var canvas;
+var togglePlay;
+var ua;
+
+function createMovie()
+{
+    btn = document.querySelector('button');
+    btn.disabled = true;
+
+    audio = new Audio();
+    video = document.createElement('video');
+    canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 640;
+    ctx = canvas.getContext('2d');
+    ua = navigator.userAgent;
+    mode = 'none';
+
+    if(/(iPhone|iPod)/.test(ua)) { // iPhoneでvideoをインライン再生
+        //ctx.scale(0.5,0.5);
+        var prms1 = new Promise(function(resolve, reject) {
+            video.addEventListener('canplay',function(){
+                resolve();
+            });
+            video.addEventListener('error',function(){
+                reject();
+                alert('failed loading video');
+            });
+        });
+        var prms2 = new Promise(function(resolve, reject) {
+            audio.addEventListener('canplay',function(){
+                resolve();
+            });
+            audio.addEventListener('error',function(){
+                reject();
+                alert('failed loading audio');
+            });
+        });
+        Promise.all([prms1,prms2]).then(function(){
+            btn.disabled = false;
+            mode = 'currentTime';
+            makeSkybox();
+        });
+        video.src = videoFile;
+        video.load();
+        audio.src = videoFile;
+        audio.load();
+
+        togglePlay = function(){
+            if(audio.paused){
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        };
+
+    } else { // Androidなどは素直にVideoタグで再生
+        //video.style.display = 'block';
+        video.src = videoFile;
+        video.load();
+        video.addEventListener('canplay',function(){
+        btn.disabled = false;
+        mode = 'defaultPlay';
+        makeSkybox();
+        },false);
+        video.addEventListener('error',function(){
+            alert('failed loading video');
+        });
+
+        togglePlay = function(){
+            if(video.paused){
+                video.play();
+            } else {
+                video.pause();
+            }
+        };
+    }
+
+    btn.addEventListener('click',togglePlay);
+
+    //生成したcanvasをtextureとしてTHREE.Textureオブジェクトを生成
+    videoTexture = new THREE.Texture(canvas);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+
+    //生成したtextureをmapに指定し、overdrawをtureにしてマテリアルを生成
+    var sky;
+    function makeSkybox(){
+    var material = new THREE.MeshBasicMaterial({map: videoTexture, overdraw: true, side:THREE.DoubleSide});
+    var geometry = new THREE.SphereGeometry( 500, 20, 20 );
+    geometry.scale( - 1, 1, 1 );
+    sky = new THREE.Mesh( geometry, material );
+    scene.add( sky );
+    }
+}
+
+/* ---------------------------------------------------------- */
 function initReticulum()
 {
     Reticulum.init(camera, {
         proximity: false,
-        clickevents: true,
+        clickevents: false,
         near: null, //near factor of the raycaster (shouldn't be negative and should be smaller than the far property)
         far: null, //far factor of the raycaster (shouldn't be negative and should be larger than the near property)
         reticle: {
@@ -241,7 +365,6 @@ function loop()
     renderer.clear();
     controls.update();
     Reticulum.update();
-    // UpdateRaycast();
 
     // ↓ Use PC
     if(useSmartPhone == false)
@@ -253,6 +376,20 @@ function loop()
     if(useSmartPhone)
     {
         effect.render(scene, camera);
+    }
+
+    // Use Movie
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        //videoImageContext.drawImage(video, 0, 0);
+        if (videoTexture) {
+        videoTexture.needsUpdate = true;
+        }
+
+        if(mode == "currentTime")
+        {
+            video.currentTime = audio.currentTime;
+        }
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     }
 }
 
