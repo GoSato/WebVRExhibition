@@ -43,3 +43,6 @@ Nike + AR
 https://www.youtube.com/watch?v=5bv1qm8SsIo&feature=youtu.be
 
 ちゃんと動くのr73
+
+衝撃
+http://stackoverflow.com/questions/31776548/why-cant-javascript-play-audio-files-on-iphone-safari
